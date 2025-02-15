@@ -28,6 +28,7 @@ export function ExpensesPage() {
     receiptLink: '',
     consolidated: false,
   });
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
 
   const handleAddExpense = (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,6 +44,7 @@ export function ExpensesPage() {
       receiptLink: '',
       consolidated: false,
     });
+    setIsPopupOpen(false); // Fechar a popup após adicionar
   };
 
   const handleEditExpense = (id: number) => {
@@ -58,7 +60,7 @@ export function ExpensesPage() {
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Gastos</h1>
         <button
-          onClick={() => setNewExpense({ ...newExpense, id: expenses.length + 1 })}
+          onClick={() => setIsPopupOpen(true)}
           className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
         >
           <Plus className="w-5 h-5 mr-2" />
@@ -66,108 +68,130 @@ export function ExpensesPage() {
         </button>
       </div>
 
-      <form onSubmit={handleAddExpense} className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <div>
-            <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Descrição do Gasto</label>
-            <input
-              type="text"
-              id="description"
-              value={newExpense.description}
-              onChange={(e) => setNewExpense({ ...newExpense, description: e.target.value })}
-              className="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700"
-              required
-            />
-          </div>
-          <div>
-            <label htmlFor="category" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Categoria do Gasto</label>
-            <input
-              type="text"
-              id="category"
-              value={newExpense.category}
-              onChange={(e) => setNewExpense({ ...newExpense, category: e.target.value })}
-              className="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700"
-              required
-            />
-          </div>
-          <div>
-            <label htmlFor="employee" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Empregado</label>
-            <select
-              id="employee"
-              value={newExpense.employee}
-              onChange={(e) => setNewExpense({ ...newExpense, employee: e.target.value })}
-              className="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700"
-              required
-            >
-              <option value="">Selecione um empregado</option>
-              {/* Aqui você deve mapear os empregados disponíveis */}
-              <option value="employee1">Empregado 1</option>
-              <option value="employee2">Empregado 2</option>
-            </select>
-          </div>
-          <div>
-            <label htmlFor="cardLastFour" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Final do Cartão</label>
-            <input
-              type="text"
-              id="cardLastFour"
-              value={newExpense.cardLastFour}
-              onChange={(e) => setNewExpense({ ...newExpense, cardLastFour: e.target.value })}
-              className="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700"
-              required
-            />
-          </div>
-          <div>
-            <label htmlFor="date" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Data e Hora</label>
-            <input
-              type="datetime-local"
-              id="date"
-              value={newExpense.date}
-              onChange={(e) => setNewExpense({ ...newExpense, date: e.target.value })}
-              className="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700"
-              required
-            />
-          </div>
-          <div>
-            <label htmlFor="amount" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Valor do Gasto</label>
-            <input
-              type="number"
-              id="amount"
-              value={newExpense.amount}
-              onChange={(e) => setNewExpense({ ...newExpense, amount: Number(e.target.value) })}
-              className="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700"
-              required
-            />
-          </div>
-          <div>
-            <label htmlFor="receiptLink" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Link do Comprovante</label>
-            <input
-              type="url"
-              id="receiptLink"
-              value={newExpense.receiptLink}
-              onChange={(e) => setNewExpense({ ...newExpense, receiptLink: e.target.value })}
-              className="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700"
-              required
-            />
-          </div>
-          <div>
-            <label htmlFor="consolidated" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Consolidado</label>
-            <input
-              type="checkbox"
-              id="consolidated"
-              checked={newExpense.consolidated}
-              onChange={(e) => setNewExpense({ ...newExpense, consolidated: e.target.checked })}
-              className="mt-1"
-            />
+      {/* Popup para Adicionar Gasto */}
+      {isPopupOpen && (
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-full max-w-lg mx-4">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 text-center">Adicionar Gasto</h2>
+            <form onSubmit={handleAddExpense} className="space-y-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div>
+                  <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Descrição do Gasto</label>
+                  <input
+                    type="text"
+                    id="description"
+                    value={newExpense.description}
+                    onChange={(e) => setNewExpense({ ...newExpense, description: e.target.value })}
+                    className="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700"
+                    required
+                  />
+                </div>
+                <div>
+                  <label htmlFor="category" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Categoria do Gasto</label>
+                  <input
+                    type="text"
+                    id="category"
+                    value={newExpense.category}
+                    onChange={(e) => setNewExpense({ ...newExpense, category: e.target.value })}
+                    className="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700"
+                    required
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div>
+                  <label htmlFor="employee" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Empregado</label>
+                  <select
+                    id="employee"
+                    value={newExpense.employee}
+                    onChange={(e) => setNewExpense({ ...newExpense, employee: e.target.value })}
+                    className="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700"
+                    required
+                  >
+                    <option value="">Selecione um empregado</option>
+                    {/* Aqui você deve mapear os empregados disponíveis */}
+                    <option value="employee1">Empregado 1</option>
+                    <option value="employee2">Empregado 2</option>
+                  </select>
+                </div>
+                <div>
+                  <label htmlFor="cardLastFour" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Final do Cartão</label>
+                  <input
+                    type="text"
+                    id="cardLastFour"
+                    value={newExpense.cardLastFour}
+                    onChange={(e) => setNewExpense({ ...newExpense, cardLastFour: e.target.value })}
+                    className="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700"
+                    required
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div>
+                  <label htmlFor="date" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Data e Hora</label>
+                  <input
+                    type="datetime-local"
+                    id="date"
+                    value={newExpense.date}
+                    onChange={(e) => setNewExpense({ ...newExpense, date: e.target.value })}
+                    className="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700"
+                    required
+                  />
+                </div>
+                <div>
+                  <label htmlFor="amount" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Valor do Gasto</label>
+                  <input
+                    type="number"
+                    id="amount"
+                    value={newExpense.amount}
+                    onChange={(e) => setNewExpense({ ...newExpense, amount: Number(e.target.value) })}
+                    className="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700"
+                    required
+                  />
+                </div>
+              </div>
+              <div>
+                <label htmlFor="receiptLink" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Link do Comprovante</label>
+                <input
+                  type="url"
+                  id="receiptLink"
+                  value={newExpense.receiptLink}
+                  onChange={(e) => setNewExpense({ ...newExpense, receiptLink: e.target.value })}
+                  className="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700"
+                  required
+                />
+              </div>
+              <div>
+                <label htmlFor="consolidated" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Consolidado</label>
+                <input
+                  type="checkbox"
+                  id="consolidated"
+                  checked={newExpense.consolidated}
+                  onChange={(e) => setNewExpense({ ...newExpense, consolidated: e.target.checked })}
+                  className="mt-1"
+                />
+              </div>
+              <div className="flex justify-end space-x-2">
+                <button
+                  type="submit"
+                  className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                >
+                  Adicionar Gasto
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsPopupOpen(false)}
+                  className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-gray-700 bg-gray-200 hover:bg-gray-300 focus:outline-none"
+                >
+                  Cancelar
+                </button>
+              </div>
+            </form>
           </div>
         </div>
-        <button
-          type="submit"
-          className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
-        >
-          Adicionar Gasto
-        </button>
-      </form>
+      )}
 
+      {/* Listagem de Gastos */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Lista de Gastos</h2>
         <div className="overflow-x-auto">
